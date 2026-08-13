@@ -6,7 +6,7 @@ Audio-reaktivní projekční vizualizace pro galavečer s veřejnými vzkazy od 
 
 Otevřete veřejnou GitHub Pages adresu v aktuálním Chrome nebo Edge, povolte přístup k mikrofonu a použijte tlačítko celé obrazovky. Hosté načtou QR kód a odešlou vzkaz z mobilní stránky.
 
-Demo režim funguje i bez mikrofonu. Vzkazy využívají veřejný cloudový kanál nakonfigurovaný v `config.js` a po krátké prodlevě se zobrazí přes vizualizaci.
+Demo režim funguje i bez mikrofonu. Vzkazy využívají veřejný MQTT WebSocket kanál nakonfigurovaný v `config.js` a po krátké prodlevě se zobrazí přes vizualizaci.
 
 ## GitHub Pages
 

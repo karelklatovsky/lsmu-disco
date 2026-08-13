@@ -35,30 +35,35 @@ let guestPanelVisible = true;
 let lastCloudMessageId = '';
 let showingMessage = false;
 let controlsIdleTimer;
+let guestMessageClient;
 const messageQueue = [];
 
 const sendUrl = new URL('send.html', window.location.href).href;
 document.querySelector('#guestUrl').textContent = sendUrl.replace(/^https?:\/\//, '');
 document.querySelector('#guestQr').src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&margin=8&data=${encodeURIComponent(sendUrl)}`;
 
-async function pollGuestMessages() {
-  try {
-    const since = lastCloudMessageId || '10s';
-    const response = await fetch(`${LSMU_CONFIG.messageEndpoint}/json?poll=1&since=${encodeURIComponent(since)}`, { cache: 'no-store' });
-    if (!response.ok) return;
-    const events = (await response.text()).trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
-    for (const event of events) {
-      if (event.event !== 'message' || event.id === lastCloudMessageId) continue;
-      lastCloudMessageId = event.id;
-      try {
-        const message = JSON.parse(event.message);
-        if (typeof message.text === 'string' && message.text.trim()) {
-          messageQueue.push({ text: message.text.trim().slice(0, 120), name: String(message.name || '').trim().slice(0, 24) });
-        }
-      } catch (_) {}
-    }
-    showNextMessage();
-  } catch (_) {}
+function connectGuestMessages() {
+  guestMessageClient?.end(true);
+  guestMessageClient = mqtt.connect(LSMU_CONFIG.brokerUrl, {
+    clean: true,
+    connectTimeout: 10000,
+    reconnectPeriod: 3000,
+    clientId: `lsmu_screen_${Math.random().toString(16).slice(2)}`
+  });
+  guestMessageClient.on('connect', () => {
+    guestMessageClient.subscribe(LSMU_CONFIG.messageTopic, { qos: 1 });
+  });
+  guestMessageClient.on('message', (topic, payload) => {
+    if (topic !== LSMU_CONFIG.messageTopic) return;
+    try {
+      const message = JSON.parse(payload.toString());
+      if (!message.id || message.id === lastCloudMessageId) return;
+      lastCloudMessageId = message.id;
+      if (typeof message.text !== 'string' || !message.text.trim()) return;
+      messageQueue.push({ text: message.text.trim().slice(0, 120), name: String(message.name || '').trim().slice(0, 24) });
+      showNextMessage();
+    } catch (_) {}
+  });
 }
 
 function showNextMessage() {
@@ -321,6 +326,5 @@ document.addEventListener('touchstart', revealControls, { passive: true });
 window.addEventListener('resize', resize);
 
 resize();
-window.setInterval(pollGuestMessages, 3000);
-pollGuestMessages();
+connectGuestMessages();
 requestAnimationFrame(frame);

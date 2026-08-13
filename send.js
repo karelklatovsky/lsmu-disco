@@ -4,6 +4,25 @@ const nameInput = document.querySelector('#name');
 const submitButton = document.querySelector('#submitButton');
 const result = document.querySelector('#result');
 const count = document.querySelector('#count');
+const senderClient = mqtt.connect(LSMU_CONFIG.brokerUrl, {
+  clean: true,
+  connectTimeout: 10000,
+  reconnectPeriod: 3000,
+  clientId: `lsmu_guest_${Math.random().toString(16).slice(2)}`
+});
+
+function publishMessage(message) {
+  return new Promise((resolve, reject) => {
+    const timeout = window.setTimeout(() => reject(new Error('Připojení vypršelo')), 12000);
+    const publish = () => {
+      senderClient.publish(LSMU_CONFIG.messageTopic, JSON.stringify(message), { qos: 1 }, (error) => {
+        window.clearTimeout(timeout);
+        error ? reject(error) : resolve();
+      });
+    };
+    senderClient.connected ? publish() : senderClient.once('connect', publish);
+  });
+}
 
 messageInput.addEventListener('input', () => {
   count.textContent = messageInput.value.length;
@@ -27,12 +46,7 @@ form.addEventListener('submit', async (event) => {
   result.className = 'result';
   result.textContent = 'Odesílám…';
   try {
-    const response = await fetch(LSMU_CONFIG.messageEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
-      body: JSON.stringify({ text, name })
-    });
-    if (!response.ok) throw new Error('Odeslání se nezdařilo');
+    await publishMessage({ id: crypto.randomUUID(), text, name, sentAt: Date.now() });
     localStorage.setItem('lsmu-last-message', String(Date.now()));
     messageInput.value = '';
     count.textContent = '0';
