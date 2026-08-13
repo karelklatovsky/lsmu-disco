@@ -15,6 +15,7 @@ const scenes = ['Paprsky', 'Spektrum', 'Tunel', 'Kaleidoskop'];
 const LASER_DURATION = 5000;
 const LASER_MIN_INTERVAL = 8000;
 const LASER_MAX_INTERVAL = 60000;
+const CONTROLS_IDLE_TIMEOUT = 5000;
 let width = 0;
 let height = 0;
 let dpr = 1;
@@ -33,6 +34,7 @@ let mids = 0;
 let guestPanelVisible = true;
 let lastCloudMessageId = '';
 let showingMessage = false;
+let controlsIdleTimer;
 const messageQueue = [];
 
 const sendUrl = new URL('send.html', window.location.href).href;
@@ -77,6 +79,13 @@ function scheduleLaser(from) {
   return from + LASER_MIN_INTERVAL + Math.random() * (LASER_MAX_INTERVAL - LASER_MIN_INTERVAL);
 }
 
+function revealControls() {
+  if (sourceMode === 'idle') return;
+  controls.classList.add('visible');
+  window.clearTimeout(controlsIdleTimer);
+  controlsIdleTimer = window.setTimeout(() => controls.classList.remove('visible'), CONTROLS_IDLE_TIMEOUT);
+}
+
 function resize() {
   dpr = Math.min(window.devicePixelRatio || 1, 2);
   width = window.innerWidth;
@@ -112,7 +121,7 @@ function activate(label, mode) {
   status.classList.add('live');
   status.querySelector('span').textContent = label;
   welcome.classList.add('hidden');
-  controls.classList.add('visible');
+  revealControls();
   guestPanel.classList.toggle('visible', guestPanelVisible);
   showNextMessage();
 }
@@ -300,11 +309,15 @@ document.querySelector('#fullscreenButton').addEventListener('click', async () =
 });
 document.addEventListener('fullscreenchange', () => document.body.classList.toggle('projecting', Boolean(document.fullscreenElement)));
 document.addEventListener('keydown', (event) => {
+  revealControls();
   if (event.key === 'ArrowRight') setScene(sceneIndex + 1);
   if (event.key === 'ArrowLeft') setScene(sceneIndex - 1);
   if (event.key.toLowerCase() === 'l') triggerLaser();
   if (event.key.toLowerCase() === 'f') document.querySelector('#fullscreenButton').click();
 });
+document.addEventListener('pointermove', revealControls, { passive: true });
+document.addEventListener('pointerdown', revealControls, { passive: true });
+document.addEventListener('touchstart', revealControls, { passive: true });
 window.addEventListener('resize', resize);
 
 resize();

@@ -22,3 +22,4 @@ Demo režim funguje i bez mikrofonu. Vzkazy využívají veřejný cloudový kan
 - `F`: celá obrazovka
 - Kruhové šipky: automatické střídání efektů
 - QR tlačítko: zobrazení nebo skrytí odkazu pro hosty
+- Ovládací panel se po 5 sekundách nečinnosti skryje a vrátí se při pohybu, dotyku nebo stisku klávesy
