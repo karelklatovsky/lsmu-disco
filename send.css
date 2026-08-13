@@ -1,0 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;700;800&display=swap');
+
+:root { font-family: 'Syne', sans-serif; color: #0a0a0c; background: #d7ff3f; }
+* { box-sizing: border-box; }
+body { min-height: 100vh; margin: 0; background: linear-gradient(145deg, #d7ff3f 0 60%, #24e8ff 100%); }
+body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: .12; background-image: repeating-linear-gradient(90deg, transparent 0 23px, #0a0a0c 24px); }
+header { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 20px; font: 500 10px 'DM Mono', monospace; text-transform: uppercase; }
+.logo { display: grid; place-items: center; width: 64px; height: 46px; border: 2px solid currentColor; font: 800 13px 'Syne', sans-serif; }
+main { position: relative; width: min(100% - 40px, 560px); margin: 5vh auto 80px; }
+.eyebrow { margin: 0 0 14px; font: 500 11px 'DM Mono', monospace; text-transform: uppercase; }
+h1 { margin: 0 0 40px; font-size: clamp(50px, 15vw, 88px); line-height: .84; text-transform: uppercase; }
+h1 em { color: transparent; font-style: normal; -webkit-text-stroke: 1.5px #0a0a0c; }
+form { position: relative; padding: 24px; border: 2px solid #0a0a0c; background: #f9f7ff; box-shadow: 10px 10px 0 #ff3ca6; }
+label { display: block; margin: 0 0 8px; font: 500 10px 'DM Mono', monospace; text-transform: uppercase; }
+label small { color: #74717b; }
+textarea, input { display: block; width: 100%; border: 0; border-bottom: 2px solid #0a0a0c; border-radius: 0; outline: 0; background: transparent; color: #0a0a0c; font: 600 17px 'Syne', sans-serif; }
+textarea { resize: none; padding: 10px 0; }
+input { margin-bottom: 26px; padding: 12px 0; }
+textarea:focus, input:focus { border-color: #ff3ca6; }
+.counter { margin: 7px 0 25px; text-align: right; color: #74717b; font: 400 9px 'DM Mono', monospace; }
+button { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 56px; padding: 0 18px; border: 0; border-radius: 0; background: #0a0a0c; color: #fff; font: 800 12px 'Syne', sans-serif; text-transform: uppercase; cursor: pointer; }
+button:disabled { opacity: .45; cursor: wait; }
+button svg { width: 22px; fill: none; stroke: #d7ff3f; stroke-width: 1.8; }
+.result { min-height: 28px; margin-top: 28px; font: 500 12px 'DM Mono', monospace; }
+.result.success { font-weight: 500; }
+.result.error { color: #a40046; }
+footer { position: relative; padding: 20px; font: 400 9px 'DM Mono', monospace; text-align: center; }
